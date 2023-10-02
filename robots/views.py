@@ -1,23 +1,27 @@
+import json
+import jsonschema
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ValidationError
 
-from .forms import RobotForm
+from .models import Robot
+from .schemas import ROBOT_SCHEMA
 
 
 @csrf_exempt
 def add_robot(request):
     if request.method == 'POST':
-        form = RobotForm(request.POST or None)
         try:
-            if form.is_valid():
-                robot = form.save(commit=False)
-                robot.serial = robot.model + '-' + robot.version
-                robot.save()
-                return HttpResponse(f'create robot {str(robot.id)}', status=201)
-            else:
-                errors = form.errors
-                return HttpResponse(form.is_valid(), status=400)
+            data = json.loads(request.body)
+            jsonschema.validate(data, ROBOT_SCHEMA)
+            robot = Robot.objects.create(
+                serial=data['model'] + '-' + data['version'],
+                model=data['model'],
+                version=data['version'],
+                created=data['created']
+            )
+            return HttpResponse(f'created robot {robot.id}', status=201)
+        except jsonschema.ValidationError as e:
+            return HttpResponse(str(e), status=400)
         except Exception as e:
             return HttpResponse(str(e), status=400)
     else:
