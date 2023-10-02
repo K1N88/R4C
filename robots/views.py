@@ -12,9 +12,12 @@ def add_robot(request):
         print(form.validate())
         try:
             if form.is_valid():
-                robot = form.save()
-                return HttpResponse(f'robot_id {str(robot.id)}', status=201)
+                robot = form.save(commit=False)
+                robot.serial = robot.model + '-' + robot.version
+                robot.save()
+                return HttpResponse(f'create robot {str(robot.id)}', status=201)
             else:
+                errors = form.errors
                 return HttpResponse(form.is_valid(), status=400)
         except Exception as e:
             return HttpResponse(str(e), status=400)
