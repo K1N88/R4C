@@ -1,5 +1,5 @@
 from orders.signals import message
-from .models import Robot
+from .models import Robot, Order
 
 
 @receiver(post_save, sender=Robot)
