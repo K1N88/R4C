@@ -9,7 +9,6 @@ from .forms import RobotForm
 def add_robot(request):
     if request.method == 'POST':
         form = RobotForm(request.POST or None)
-        print(form.validate())
         try:
             if form.is_valid():
                 robot = form.save(commit=False)
