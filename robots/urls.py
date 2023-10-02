@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import add_robot, week_report
+from .views import add_robot, export_report
 
 
 urlpatterns = [
     path('add_robot/', add_robot, name='add_robot'),
-    path('week_report/', week_report, name='week_report'),
+    path('export_report/', export_report, name='export_report'),
 ]
